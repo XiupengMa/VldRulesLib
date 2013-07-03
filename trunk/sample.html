@@ -1,0 +1,42 @@
+<html>
+<head>
+    <meta charset="UTF-8"></meta>
+    <title>Sample of VldRulesLib</title>
+    <style type="text/css">
+        .message{
+            border:1px dashed red;
+            width:350px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main">
+    <label for="data">验证数据:</label>
+    <input id="data" name="data"/>
+    <select id="rule" name="rule">
+        <option value="required">不为空</option>
+        <option value="min[3]&max[10]">长度3-10</option>
+        <option value="email">email</option>
+        <option value="phone">座机</option>
+        <option value="mobile">手机</option>
+        <option value="url">URL</option>
+        <option value="alphanumeric">字母数字</option>
+        <option value="alphanumeric_space">字母数字空格</option>
+        <option value="number">数字</option>
+        <option value="alpha_space">字母空格</option>
+        <option value="lt[10]">小于10</option>
+        <option value="gt[10]">大于10</option>
+        <option value="equal[10]">等于10</option>
+        <option value="idCard">身份证号码</option>
+        <option value="regexp[/\/TEST\//ig]">自定义正则</option>
+    </select>
+    <br/>
+    <div class="message"></div>
+    <input type="button" id="submit" name="submit" value="验证"/>
+</div>
+<script type="text/javascript" src="libs/jquery-2.0.1.js"></script>
+<script type="text/javascript" src="libs/VldRulesLib.js"></script>
+<script type="text/javascript" src="sample.js"></script>
+</body>
+</html>
