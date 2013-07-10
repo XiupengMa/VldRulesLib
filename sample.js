@@ -20,6 +20,7 @@ $(document).ready(function() {
         });
         var html = [];
         html.push("<b>通过: " + result.result + "</b><br/>");
+        html.push("<span>修正后数据：" + result.revisedVal + "</span><br/>");
         html.push("<span>代码: " + result.code + "</span><br/>");
         html.push("<span>消息: " + result.msg + "</span>");
         msgDiv.html(html.join(""));
