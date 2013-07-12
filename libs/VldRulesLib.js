@@ -88,7 +88,7 @@ var VldRulesLib = {
             if (value === "" || value === undefined || value === null) {
                 result.result = false,
                 result.code = "E401",
-                result.msg = msg2
+                result.msg = msg2;
                 return result;
             }
             if (typeof value != "boolean") {
@@ -208,6 +208,7 @@ var VldRulesLib = {
                 result.msg = msg1;
             } else {
                 result.result = false;
+                result.revisedVal = value.replace(/[^0-9\-\(\)\s]/ig, "");
                 result.code = "E412";
                 result.msg = msg2;
             }
@@ -227,6 +228,7 @@ var VldRulesLib = {
                 result.msg = msg1;
             } else {
                 result.result = false;
+                result.revisedVal = value.replace(/[^0-9\-\s]/ig, "");
                 result.code = "E413";
                 result.msg = msg2;
             }
@@ -749,6 +751,7 @@ var VldRulesLib = {
                 arg = args.shift().replace(/\[|\]/g, ""); //参数
             }
             if (!VldRulesLib.rulesTable[name]) {
+                console.log("规则错误！");
                 return false;
             }
             results.push({
@@ -874,7 +877,6 @@ var VldRulesLib = {
             success(value, rule, results);
             return results;
         } else {
-            console.log("规则错误！");
             return false;
         }
     },

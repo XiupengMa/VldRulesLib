@@ -149,7 +149,7 @@ test("8位", function() {
 });
 test("带字母", function() {
     var data = "123458A";
-    check(data, "phone", results.E412, data);
+    check(data, "phone", results.E412, "123458");
 });
 
 //mobile
@@ -164,7 +164,7 @@ test("非1开头", function() {
 });
 test("带字母", function() {
     var data = "1A345678901";
-    check(data, "mobile", results.E413, data);
+    check(data, "mobile", results.E413, "1345678901");
 });
 
 //url
