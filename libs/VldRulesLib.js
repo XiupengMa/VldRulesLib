@@ -33,7 +33,13 @@ var VldRulesLib = {
         E421: "数据不可用",
         E422: "包含了指定字符以外的字符",
         E423: "包含了指定的字符",
-        E424: "包含繁体字符"
+        E424: "包含繁体字符",
+        E425: "非整数",
+        E426: "非小数",
+        E427: "密码安全级别不够,至少包含数字和字母",
+        E428: "密码安全级别不够,至少包含数字和大小写字母",
+        E429: "密码安全级别不够,至少包含数字、大小写字母、符号",
+        E430: "包含多个空格"
     },
 
     //检测value是否为空，args是否为数字
@@ -302,15 +308,139 @@ var VldRulesLib = {
                 result.result = true;
                 result.code = "E201";
                 result.msg = msg1;
-            } else if (/^[\d.]*$/.test(value)) {
+            } else if (/^-?[\d\.]*$/.test(value)) {
                 result.result = true;
                 result.code = "E200";
                 result.msg = msg1;
             } else {
                 result.result = false;
-                result.revisedVal = value.replace(/[^\d.]/ig, "");
+                var newVal = value.replace(/[^\d\.-]/ig, "");
+                newVal = newVal.charAt(0) + newVal.substr(1, newVal.length - 1).replace(/-/g, "");
+                result.revisedVal = newVal;
                 result.code = "E404";
                 result.msg = msg2;
+            }
+            return result;
+        },
+
+        int: function(value, args, msg1, msg2) {
+            var result = {};
+            result.revisedVal = value;
+            if (value == "") {
+                result.result = true;
+                result.code = "E201";
+                result.msg = msg1;
+            } else if (/^-?[\d]*$/.test(value)) {
+                result.result = true;
+                result.code = "E200";
+                result.msg = msg1;
+            } else {
+                result.result = false;
+                var newVal = value.replace(/[^\d-]/ig, "");
+                newVal = newVal.charAt(0) + newVal.substr(1, newVal.length - 1).replace(/-/g, "");
+                result.revisedVal = newVal;
+                result.code = "E425";
+                result.msg = msg2;
+            }
+            return result;
+        },
+
+        float: function(value, args, msg1, msg2) {
+            var result = {};
+            result.revisedVal = value;
+            if (value == "") {
+                result.result = true;
+                result.code = "E201";
+                result.msg = msg1;
+            } else if (/^-?[\d]*\.[\d]+$/g.test(value)) {
+                result.result = true;
+                result.code = "E200";
+                result.msg = msg1;
+            } else {
+                result.result = false;
+                var newVal = value.replace(/[^\d-\.]/ig, "");
+                newVal = newVal.charAt(0) + newVal.substr(1, newVal.length - 1).replace(/-/g, "");
+                result.revisedVal = newVal;
+                result.code = "E426";
+                result.msg = msg2;
+            }
+            return result;
+        },
+
+        //第1级别,包含字母,数字
+        pwdL1: function(value, args, msg1, msg2) {
+            var result = {};
+            result.revisedVal = value;
+            var re1 = /[a-zA-Z]+/g;
+            var re2 = /[0-9]+/g;
+            if (re1.test(value) && re2.test(value)) {
+                result.result = true;
+                result.code = "E200";
+                result.msg = msg1;
+            } else {
+                result.result = false;
+                result.code = "E427";
+                result.msg = msg2;
+            }
+            return result;
+        },
+        //第2级别,包含大小写字母,数字
+        pwdL2: function(value, args, msg1, msg2) {
+            var result = {};
+            result.revisedVal = value;
+            var re1 = /[a-z]+/g;
+            var re2 = /[A-Z]+/g;
+            var re3 = /[0-9]+/g;
+            if (re1.test(value) && re2.test(value) && re3.test(value)) {
+                result.result = true;
+                result.code = "E200";
+                result.msg = msg1;
+            } else {
+                result.result = false;
+                result.code = "E428";
+                result.msg = msg2;
+            }
+            return result;
+        },
+        //第3级别,包含大小写字母,数字,符号
+        pwdL3: function(value, args, msg1, msg2) {
+            var result = {};
+            result.revisedVal = value;
+            var re1 = /[a-z]+/g;
+            var re2 = /[A-Z]+/g;
+            var re3 = /[0-9]+/g;
+            var re4 = /[~!@#$%^&*()_+=\-`\{\}|:\"<>\?\[\]\\;\',\.\/]+/g;
+            if (re1.test(value) && re2.test(value) && re3.test(value) && re4.test(value)) {
+                result.result = true;
+                result.code = "E200";
+                result.msg = msg1;
+            } else {
+                result.result = false;
+                result.code = "E429";
+                result.msg = msg2;
+            }
+            return result;
+        },
+
+        //是否只包含单一空格,多个连续空格合并成一个
+        singleSpace: function(value, args, msg1, msg2) {
+            var result = {};
+            result.revisedVal = value;
+            var re = /[\s]{2,}/g;
+            if(value == ""){
+                result.result = true;
+                result.code = "E201";
+                result.msg = msg1;
+            }
+            if(re.test(value)){
+                result.result = false;
+                result.revisedVal = value.replace(re," ");
+                result.code = "E430"
+                result.msg = msg2;
+            } else {
+                result.result = true;
+                result.code = "E200";
+                result.msg = msg1;
             }
             return result;
         },
@@ -619,7 +749,6 @@ var VldRulesLib = {
                 arg = args.shift().replace(/\[|\]/g, ""); //参数
             }
             if (!VldRulesLib.rulesTable[name]) {
-                console.log("规则错误！");
                 return false;
             }
             results.push({

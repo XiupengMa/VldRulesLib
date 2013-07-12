@@ -246,12 +246,158 @@ test("数字", function() {
     var data = "1234321";
     check(data, "number", results.E200, data);
 });
+test("负数", function() {
+    var data = "-1234321";
+    check(data, "number", results.E200, data);
+});
+test("小数", function() {
+    var data = "1234321.111231";
+    check(data, "number", results.E200, data);
+});
+test("多个负号",function() {
+    var data = "-123--45.-1-2-3-%$#ADFdf";
+    check(data, "number", results.E404, "-12345.123");
+});
 test("字母符号", function() {
     var data = "+_)(*&^%$#@!<>?:{}[];',./\"asdfghjkl ";
     check(data, "number", results.E404, ".");
 });
 
-//aloha
+//int
+module("int");
+test("数字", function() {
+    var data = "1234321";
+    check(data, "int", results.E200, data);
+});
+test("负数", function() {
+    var data = "-1234321";
+    check(data, "int", results.E200, data);
+});
+test("小数", function() {
+    var data = "1234321.111231";
+    check(data, "int", results.E425, "1234321111231");
+});
+test("多个负号",function() {
+    var data = "-123--45-1-2-3-%$#ADFdf";
+    check(data, "int", results.E425, "-12345123");
+});
+test("字母符号", function() {
+    var data = "+_)(*&^%$#@!<>?:{}[];',1/\"asdfghjkl ";
+    check(data, "int", results.E425, "1");
+});
+
+//float
+module("float");
+test("整数", function() {
+    var data = "1234321";
+    check(data, "float", results.E426, data);
+});
+test("负数", function() {
+    var data = "-123.4321";
+    check(data, "float", results.E200, data);
+});
+test("小数", function() {
+    var data = "1234321.111231";
+    check(data, "float", results.E200, data);
+});
+test("多个负号",function() {
+    var data = "-123--45-1-2-3-%$#ADFdf";
+    check(data, "float", results.E426, "-12345123");
+});
+test("字母符号", function() {
+    var data = "+_)(*&^%$#@!<>?:{}[];',1/\"asdfghjkl ";
+    check(data, "float", results.E426, "1");
+});
+
+//pwdL1
+module("pwdL1");
+test("满足", function() {
+    var data = "asdf123adf1";
+    check(data, "pwdL1", results.E200, data);
+});
+test("无数字", function() {
+    var data = "asdfadf";
+    check(data, "pwdL1", results.E427, data);
+});
+test("无字母", function() {
+    var data = "1233211234567";
+    check(data, "pwdL1", results.E427, data);
+});
+test("复杂密码", function() {
+    var data = "abcd123EFGH@sogou.com!@#";
+    check(data, "pwdL1", results.E200, data);
+});
+
+//pwdL2
+module("pwdL2");
+test("满足", function() {
+    var data = "asdf123adf1ASDF";
+    check(data, "pwdL2", results.E200, data);
+});
+test("无数字", function() {
+    var data = "asdfadf";
+    check(data, "pwdL2", results.E428, data);
+});
+test("无小写字母", function() {
+    var data = "1233211234567ASDF";
+    check(data, "pwdL2", results.E428, data);
+});
+test("无大写字母", function() {
+    var data = "123321asdf1234567";
+    check(data, "pwdL2", results.E428, data);
+});
+test("复杂密码", function() {
+    var data = "abcd123EFGH@sogou.com!@#";
+    check(data, "pwdL2", results.E200, data);
+});
+
+//pwdL3
+module("pwdL3");
+test("满足", function() {
+    var data = "asdf123adf1ASDF!@#';/.,";
+    check(data, "pwdL3", results.E200, data);
+});
+test("无数字", function() {
+    var data = "asdfadf";
+    check(data, "pwdL3", results.E429, data);
+});
+test("无小写字母", function() {
+    var data = "1233211234567ASDF";
+    check(data, "pwdL3", results.E429, data);
+});
+test("无大写字母", function() {
+    var data = "123321asdf1234567";
+    check(data, "pwdL3", results.E429, data);
+});
+test("无符号", function() {
+    var data = "123321asdf1234567ASDF";
+    check(data, "pwdL3", results.E429, data);
+});
+test("复杂密码", function() {
+    var data = "abcd123EFGH@sogou.com!@#";
+    check(data, "pwdL3", results.E200, data);
+});
+
+//singleSpace
+module("singleSpace");
+test("无空格", function() {
+    var data = "asdf123adf1ASDF!@#';/.,";
+    check(data, "singleSpace", results.E200, data);
+});
+test("单一空格", function() {
+    var data = "asdf12 3a df1 ASD F!@#' ; / .,";
+    check(data, "singleSpace", results.E200, data);
+});
+test("连续空格", function() {
+    var data = "asdf12  3a     df1   ASD F!@#'     ;    /                .,";
+    check(data, "singleSpace", results.E430, "asdf12 3a df1 ASD F!@#' ; / .,");
+});
+test("全部空格", function() {
+    var data = "                                   ";
+    check(data, "singleSpace", results.E430, " ");
+});
+
+//alpha
 module("alpha");
 test("字母", function() {
     var data = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
