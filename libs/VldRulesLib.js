@@ -4,11 +4,21 @@
  * @date 2013-6-26
  */
 
+function setResult(result, code, msg, revisedVal){
+    var result = {
+        result: result,
+        code: code,
+        msg: msg,
+        revisedVal: revisedVal
+    };
+    return result;
+}
+
 var VldRulesLib = {
     CODE_TABLE: {
         //2XX表示验证通过
         E200: "验证通过",
-        E201: "数据为空",
+        //E201: "数据为空", //只返回一种通过的代码似乎更好
         //4XX表示验证失败
         E401: "输入数据为空",
         E402: "长度超出",
@@ -46,25 +56,14 @@ var VldRulesLib = {
     checkValueArgs: function(value, args, msg1, msg2) {
         var result = {};
         if (value == "") {
-            result.result = true;
-            result.revisedVal = value;
-            result.code = "E201";
-            result.msg = msg1;
-            return result;
+            //return setResult(true, "E201", msg1, value);
+            return setResult(true, "E200", msg1, value);
         }
         if (args.length == 0 || !/^[\d.-]*$/.test(args)) {
-            result.result = false;
-            result.revisedVal = value;
-            result.code = "E416";
-            result.msg = msg2;
-            return result;
+            return setResult(false, "E416", msg2, value);
         }
         if (!/^[\d.-]*$/.test(value)) {
-            result.result = false;
-            result.revisedVal = value.replace(/[^\d.-]/ig, "");
-            result.code = "E404";
-            result.msg = msg2;
-            return result;
+            return setResult(false, "E404", msg2, value.replace(/[^\d.-]/ig, ""));
         }
         return result;
     },
@@ -84,160 +83,104 @@ var VldRulesLib = {
         //value是否严格相等true
         ok: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             if (value === "" || value === undefined || value === null) {
-                result.result = false,
-                result.code = "E401",
-                result.msg = msg2;
-                return result;
+                return setResult(false, "E401", msg2, value);
             }
             if (typeof value != "boolean") {
-                result.result = false;
-                result.code = "E419";
-                result.msg = msg2;
+                result = setResult(false, "E419", msg2, value);
             } else if (value === true) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else if (value === false) {
-                result.result = false;
-                result.code = "E420";
-                result.msg = msg2;
+                result = setResult(false, "E420", msg2, value);
             }
             return result;
         },
         //value是否为true(非严格相等)
         valid: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             if (value) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.revisedVal = true;
-                result.code = "E421";
-                result.msg = msg2;
+                result = setResult(false, "E421", msg2, true);
             }
             return result;
         },
         required: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             if (value.length == 0) {
-                result.result = false;
-                result.code = "E401";
-                result.msg = msg2;
+                result = setResult(false, "E401", msg2, value);
             } else {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);;
             }
             return result;
         },
 
         min: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             if (value.length >= args) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else if (value.length == 0) {
-                result.result = false;
-                result.code = "E401";
-                result.msg = msg2;
+                result = setResult(false, "E401", msg2, value);
             } else {
-                result.result = false;
-                result.code = "E403";
-                result.msg = msg2;
+                result = setResult(false, "E403", msg2, value);
             }
             return result;
         },
 
         max: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             if (value.length == 0) {
-                result.result = true;
-                result.code = "E201";
-                result.msg = msg1;
+                //result = setResult(true, "E201", msg1, value);
+                result = setResult(true, "E200", msg1, value);
             } else if (value.length <= args) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.revisedVal = value.substr(0, args);
-                result.code = "E402";
-                result.msg = msg2;
+                result = setResult(false, "E402", msg2, value.substr(0, args));
             }
             return result;
         },
 
         email: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             if (value == "") {
-                result.result = true;
-                result.code = "E201";
-                result.msg = msg1;
+                //result = setResult(true, "E201", msg1, value);
+                result = setResult(true, "E200", msg1, value);
             } else if (/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/.test(value)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.code = "E411";
-                result.msg = msg2;
+                result = setResult(false, "E411", msg2, value);
             }
             return result;
         },
 
         phone: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             if (value == "") {
-                result.result = true;
-                result.code = "E201";
-                result.msg = msg1;
+                //result = setResult(true, "E201", msg1, value);
+                result = setResult(true, "E200", msg1, value);
             } else if (/^((\(\d{2,3}\))|(\d{3}\-))?(\(0\d{2,3}\)|0\d{2,3}-)?[1-9]\d{6,7}(\-\d{1,4})?$/.test(value)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.revisedVal = value.replace(/[^0-9\-\(\)\s]/ig, "");
-                result.code = "E412";
-                result.msg = msg2;
+                result = setResult(false, "E412", msg2, value.replace(/[^0-9\-\(\)\s]/ig, ""));
             }
             return result;
         },
 
         mobile: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             if (value == "") {
-                result.result = true;
-                result.code = "E201";
-                result.msg = msg1;
+                //result = setResult(true, "E201", msg1, value);
+                result = setResult(true, "E200", msg1, value);
             } else if (/^((\(\d{2,3}\))|(\d{3}\-))?1\d{10}$/.test(value)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.revisedVal = value.replace(/[^0-9\-\s]/ig, "");
-                result.code = "E413";
-                result.msg = msg2;
+                result = setResult(false, "E413", msg2, value.replace(/[^0-9\-\s\(\)]/ig, ""));
             }
             return result;
         },
 
         url: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             var regStr = '^((https|http|ftp|rtsp|mms)?://)' + '?(([0-9a-z_!~*\'().&=+$%-]+: )?[0-9a-z_!~*\'().&=+$%-]+@)?' //ftp的user@
             + '(([0-9]{1,3}.){3}[0-9]{1,3}' // IP形式的URL- 199.194.52.184
             + '|' // 允许IP和DOMAIN（域名）
@@ -248,123 +191,84 @@ var VldRulesLib = {
             + '((/?)|' // a slash isn't required if there is no file name
             + '(/[0-9a-z_!~*\'().;?:@&=+$,%#-]+)+/?)$';
             if (value == "") {
-                result.result = true;
-                result.code = "E201";
-                result.msg = msg1;
+                //result = setResult(true, "E201", msg1, value);
+                result = setResult(true, "E200", msg1, value);
             } else if (new RegExp(regStr).test(value)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.code = "E414";
-                result.msg = msg2;
+                result = setResult(false, "E414", msg2, value);
             }
             return result;
         },
 
         alphanumeric: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             if (value == "") {
-                result.result = true;
-                result.code = "E201";
-                result.msg = msg1;
+                //result = setResult(true, "E201", msg1, value);
+                result = setResult(true, "E200", msg1, value);
             } else if (/^[A-Za-z0-9]*$/.test(value)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.revisedVal = value.replace(/[^A-Za-z0-9]/ig, "");
-                result.code = "E406";
-                result.msg = msg2;
+                result = setResult(false, "E406", msg2, value.replace(/[^A-Za-z0-9]/ig, ""));
             }
             return result;
         },
 
         alphanumeric_underline: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             if (value == "") {
-                result.result = true;
-                result.code = "E201";
-                result.msg = msg1;
+                //result = setResult(true, "E201", msg1, value);
+                result = setResult(true, "E200", msg1, value);
             } else if (/^[a-zA-Z0-9_]*$/.test(value)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.revisedVal = value.replace(/[^a-zA-Z0-9_]/ig, "");
-                result.code = "E407";
-                result.msg = msg2;
+                result = setResult(false, "E407", msg2, value.replace(/[^a-zA-Z0-9_]/ig, ""));
             }
             return result;
         },
 
         number: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             if (value == "") {
-                result.result = true;
-                result.code = "E201";
-                result.msg = msg1;
+                //result = setResult(true, "E201", msg1, value);
+                result = setResult(true, "E200", msg1, value);
             } else if (/^-?[\d\.]*$/.test(value)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
                 var newVal = value.replace(/[^\d\.-]/ig, "");
                 newVal = newVal.charAt(0) + newVal.substr(1, newVal.length - 1).replace(/-/g, "");
-                result.revisedVal = newVal;
-                result.code = "E404";
-                result.msg = msg2;
+                result = setResult(false, "E404", msg2, newVal);
             }
             return result;
         },
 
         int: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             if (value == "") {
-                result.result = true;
-                result.code = "E201";
-                result.msg = msg1;
+                //result = setResult(true, "E201", msg1, value);
+                result = setResult(true, "E200", msg1, value);
             } else if (/^-?[\d]*$/.test(value)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
                 var newVal = value.replace(/[^\d-]/ig, "");
                 newVal = newVal.charAt(0) + newVal.substr(1, newVal.length - 1).replace(/-/g, "");
-                result.revisedVal = newVal;
-                result.code = "E425";
-                result.msg = msg2;
+                result = setResult(false, "E425", msg2, newVal);
             }
             return result;
         },
 
         float: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             if (value == "") {
-                result.result = true;
-                result.code = "E201";
-                result.msg = msg1;
+                //result = setResult(true, "E201", msg1, value);
+                result = setResult(true, "E200", msg1, value);
             } else if (/^-?[\d]*\.[\d]+$/g.test(value)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
                 var newVal = value.replace(/[^\d-\.]/ig, "");
                 newVal = newVal.charAt(0) + newVal.substr(1, newVal.length - 1).replace(/-/g, "");
                 result.revisedVal = newVal;
-                result.code = "E426";
-                result.msg = msg2;
+                result = setResult(false, "E426", msg2, newVal);
             }
             return result;
         },
@@ -372,54 +276,39 @@ var VldRulesLib = {
         //第1级别,包含字母,数字
         pwdL1: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             var re1 = /[a-zA-Z]+/g;
             var re2 = /[0-9]+/g;
             if (re1.test(value) && re2.test(value)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.code = "E427";
-                result.msg = msg2;
+                result = setResult(false, "E427", msg2, value);
             }
             return result;
         },
         //第2级别,包含大小写字母,数字
         pwdL2: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             var re1 = /[a-z]+/g;
             var re2 = /[A-Z]+/g;
             var re3 = /[0-9]+/g;
             if (re1.test(value) && re2.test(value) && re3.test(value)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.code = "E428";
-                result.msg = msg2;
+                result = setResult(false, "E428", msg2, value);
             }
             return result;
         },
         //第3级别,包含大小写字母,数字,符号
         pwdL3: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             var re1 = /[a-z]+/g;
             var re2 = /[A-Z]+/g;
             var re3 = /[0-9]+/g;
             var re4 = /[~!@#$%^&*()_+=\-`\{\}|:\"<>\?\[\]\\;\',\.\/]+/g;
             if (re1.test(value) && re2.test(value) && re3.test(value) && re4.test(value)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.code = "E429";
-                result.msg = msg2;
+                result = setResult(false, "E429", msg2, value);
             }
             return result;
         },
@@ -427,62 +316,41 @@ var VldRulesLib = {
         //是否只包含单一空格,多个连续空格合并成一个
         singleSpace: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             var re = /[\s]{2,}/g;
             if(value == ""){
-                result.result = true;
-                result.code = "E201";
-                result.msg = msg1;
+                //result = setResult(true, "E201", msg1, value);
+                result = setResult(true, "E200", msg1, value);
             }
             if(re.test(value)){
-                result.result = false;
-                result.revisedVal = value.replace(re," ");
-                result.code = "E430"
-                result.msg = msg2;
+                result = setResult(false, "E430", msg2, value.replace(re," "));
             } else {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             }
             return result;
         },
 
         alpha: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             if (value == "") {
-                result.result = true;
-                result.code = "E201";
-                result.msg = msg1;
+                //result = setResult(true, "E201", msg1, value);
+                result = setResult(true, "E200", msg1, value);
             } else if (/^[A-Za-z]*$/.test(value)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.revisedVal = value.replace(/[^A-Za-z]/ig, "");
-                result.code = "E405";
-                result.msg = msg2;
+                result = setResult(false, "E405", msg2, value.replace(/[^A-Za-z]/ig, ""));
             }
             return result;
         },
 
         alpha_underline: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             if (value == "") {
-                result.result = true;
-                result.code = "E201";
-                result.msg = msg1;
+                //result = setResult(true, "E201", msg1, value);
+                result = setResult(true, "E200", msg1, value);
             } else if (/^[A-Za-z_]*$/.test(value)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.revisedVal = value.replace(/[^A-Za-z_]/ig, "");
-                result.code = "E407";
-                result.msg = msg2;
+                result = setResult(false, "E407", msg2, value.replace(/[^A-Za-z_]/ig, ""));
             }
             return result;
         },
@@ -492,15 +360,10 @@ var VldRulesLib = {
             if (result.result !== undefined) {
                 return result;
             }
-            result.revisedVal = value;
             if (parseFloat(value) < parseFloat(args)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.code = "E408";
-                result.msg = msg2;
+                result = setResult(false, "E408", msg2, value);
             }
             return result;
         },
@@ -510,15 +373,10 @@ var VldRulesLib = {
             if (result.result !== undefined) {
                 return result;
             }
-            result.revisedVal = value;
             if (parseFloat(value) > parseFloat(args)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.code = "E409";
-                result.msg = msg2;
+                result = setResult(false, "E409", msg2, value);
             }
             return result;
         },
@@ -528,15 +386,10 @@ var VldRulesLib = {
             if (result.result !== undefined) {
                 return result;
             }
-            result.revisedVal = value;
             if (parseFloat(value) == parseFloat(args)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.code = "E415";
-                result.msg = msg2;
+                result = setResult(false, "E415", msg2, value);
             }
             return result;
         },
@@ -546,15 +399,10 @@ var VldRulesLib = {
             if (result.result !== undefined) {
                 return result;
             }
-            result.revisedVal = value;
             if (parseFloat(value) <= parseFloat(args)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.code = "E408";
-                result.msg = msg2;
+                result = setResult(false, "E408", msg2, value);
             }
             return result;
         },
@@ -564,38 +412,25 @@ var VldRulesLib = {
             if (result.result !== undefined) {
                 return result;
             }
-            result.revisedVal = value;
             if (parseFloat(value) >= parseFloat(args)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.code = "E409";
-                result.msg = msg2;
+                result = setResult(false, "E409", msg2, value);
             }
             return result;
         },
 
         idCard: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             if (value == "") {
-                result.result = true;
-                result.code = "E201";
-                result.msg = msg1;
-            } else if (!/^[\dXx]*$/.test(value)) {
-                result.result = false;
-                result.code = "E407";
-                result.msg = msg2;
+                //result = setResult(true, "E201", msg1, value);
+                result = setResult(true, "E200", msg1, value);
+            } else if (/[^\dXx]/.test(value)) {
+                result = setResult(false, "E407", msg2, value.replace(/[^\dXx]/g,""));
             } else if (/(^\d{15}$)|(^\d{17}([0-9]|X|x)$)/.test(value)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.code = "E418";
-                result.msg = msg2;
+                result = setResult(false, "E418", msg2, value);
             }
             return result;
         },
@@ -603,26 +438,18 @@ var VldRulesLib = {
         //只能包含某些字符，参数为指定字符的列表,"'\三个字符需要使用斜线转义
         only: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             if (value == "") {
-                result.result = true;
-                result.code = "E201";
-                result.msg = msg1;
-                return result;
+                //return setResult(true, "E201", msg1, value);
+                return setResult(true, "E200", msg1, value);
             }
             args = args.replace(/a-z/g, "abcdefghijklmnopqrstuvwxyz");
             args = args.replace(/A-Z/g, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
             args = args.replace(/0-9/g, "0123456789");
             var re = new RegExp("[^" + args + "]", "g");
             if (!re.test(value)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.revisedVal = value.replace(re, "");
-                result.code = "E422";
-                result.msg = msg2;
+                result = setResult(false, "E422", msg2, value.replace(re, ""));
             }
             return result;
         },
@@ -630,37 +457,26 @@ var VldRulesLib = {
         //不能包含某些字符，参数为指定字符的列表,"'\三个字符需要使用斜线转义
         exclude: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             if (value == "") {
-                result.result = true;
-                result.code = "E201";
-                result.msg = msg1;
-                return result;
+                //return setResult(true, "E201", msg1, value);
+                return setResult(true, "E200", msg1, value);
             }
             args = args.replace(/a-z/g, "abcdefghijklmnopqrstuvwxyz");
             args = args.replace(/A-Z/g, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
             args = args.replace(/0-9/g, "0123456789");
             var re = new RegExp("[" + args + "]", "g");
             if (!re.test(value)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.revisedVal = value.replace(re, "");
-                result.code = "E423";
-                result.msg = msg2;
+                result = setResult(false, "E423", msg2, value.replace(re, ""));
             }
             return result;
         },
         trad2simp: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             if(value == ""){
-                result.result = true;
-                result.code = "E201";
-                result.msg = msg1;
-                return result;
+                //return result = setResult(true, "E201", msg1, value);
+                return result = setResult(true, "E200", msg1, value);
             }
             var hasTrad = false;
             var newVal = [];
@@ -676,20 +492,14 @@ var VldRulesLib = {
                 }
             }
             if(!hasTrad){
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             }else{
-                result.result = false;
-                result.revisedVal = newVal.join("");
-                result.code = "E424";
-                result.msg = msg2;
+                result = setResult(false, "E424", msg2, newVal.join(""));
             }
             return result;
         },
         regexp: function(value, args, msg1, msg2) {
             var result = {};
-            result.revisedVal = value;
             // if(value == ""){
             //     result.result = true;
             //     result.code = "E201";
@@ -698,19 +508,12 @@ var VldRulesLib = {
             // }
             var re = eval(args);
             if (!re instanceof RegExp) {
-                result.result = false;
-                result.code = "E416";
-                result.msg = msg2;
-                return result;
+                return setResult(false, "E416", msg2, value);
             }
             if (re.test(value)) {
-                result.result = true;
-                result.code = "E200";
-                result.msg = msg1;
+                result = setResult(true, "E200", msg1, value);
             } else {
-                result.result = false;
-                result.code = "E417";
-                result.msg = msg2;
+                result = setResult(false, "E417", msg2, value);
             }
             return result;
         }
@@ -774,10 +577,10 @@ var VldRulesLib = {
      */
     validate: function(value, rule, msg1, msg2, success, fail) {
         if (typeof success != "function") {
-            success = function() {};
+            success = $.noop;
         }
         if (typeof fail != "function") {
-            fail = function() {};
+            fail = $.noop;
         }
 
         if(rule instanceof RegExp){

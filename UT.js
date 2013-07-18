@@ -111,19 +111,22 @@ test("max[3]", function() {
     data = "12";
     check(data, "max[3]", results.E200, data);
     data = "";
-    check(data, "max[3]", results.E201, data);
+    //check(data, "max[3]", results.E201, data);
+    check(data, "max[3]", results.E200, data);
 });
 test("max[0]", function() {
     var data = "1234";
     check(data, "max[0]", results.E402, "");
     data = "";
-    check(data, "max[0]", results.E201, "");
+    //check(data, "max[0]", results.E201, "");
+    check(data, "max[0]", results.E200, "");
 });
 test("max[-3]", function() {
     var data = "1234";
     check(data, "max[-3]", results.E402, "");
     data = "";
-    check(data, "max[-3]", results.E201, "");
+    //check(data, "max[-3]", results.E201, "");
+    check(data, "max[-3]", results.E200, "");
 });
 
 //email
