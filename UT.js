@@ -257,7 +257,7 @@ test("小数", function() {
     var data = "1234321.111231";
     check(data, "number", results.E200, data);
 });
-test("多个负号",function() {
+test("多个负号", function() {
     var data = "-123--45.-1-2-3-%$#ADFdf";
     check(data, "number", results.E404, "-12345.123");
 });
@@ -280,7 +280,7 @@ test("小数", function() {
     var data = "1234321.111231";
     check(data, "int", results.E425, "1234321111231");
 });
-test("多个负号",function() {
+test("多个负号", function() {
     var data = "-123--45-1-2-3-%$#ADFdf";
     check(data, "int", results.E425, "-12345123");
 });
@@ -303,7 +303,7 @@ test("小数", function() {
     var data = "1234321.111231";
     check(data, "float", results.E200, data);
 });
-test("多个负号",function() {
+test("多个负号", function() {
     var data = "-123--45-1-2-3-%$#ADFdf";
     check(data, "float", results.E426, "-12345123");
 });
@@ -644,18 +644,46 @@ test("简单正则", function() {
 test("直接正则", function() {
     var data = "http://www.baidu.com/abc.html";
     var re = new RegExp('^((https|http|ftp|rtsp|mms)?://)' + '?(([0-9a-z_!~*\'().&=+$%-]+: )?[0-9a-z_!~*\'().&=+$%-]+@)?' //ftp的user@
-            + '(([0-9]{1,3}.){3}[0-9]{1,3}' // IP形式的URL- 199.194.52.184
-            + '|' // 允许IP和DOMAIN（域名）
-            + '([0-9a-z_!~*\'()-]+.)*' // 域名- www.
-            + '([0-9a-z][0-9a-z-]{0,61})?[0-9a-z].' // 二级域名
-            + '[a-z]{2,6})' // first level domain- .com or .museum
-            + '(:[0-9]{1,4})?' // 端口- :80
-            + '((/?)|' // a slash isn't required if there is no file name
-            + '(/[0-9a-z_!~*\'().;?:@&=+$,%#-]+)+/?)$');
+        + '(([0-9]{1,3}.){3}[0-9]{1,3}' // IP形式的URL- 199.194.52.184
+        + '|' // 允许IP和DOMAIN（域名）
+        + '([0-9a-z_!~*\'()-]+.)*' // 域名- www.
+        + '([0-9a-z][0-9a-z-]{0,61})?[0-9a-z].' // 二级域名
+        + '[a-z]{2,6})' // first level domain- .com or .museum
+        + '(:[0-9]{1,4})?' // 端口- :80
+        + '((/?)|' // a slash isn't required if there is no file name
+        + '(/[0-9a-z_!~*\'().;?:@&=+$,%#-]+)+/?)$');
     check(data, re, results.E200, data);
 });
-test("直接正则",function(){
+test("直接正则", function() {
     var data = "111";
     var re = /test/;
     check(data, re, results.E417, data);
+});
+
+//textarea
+module("textarea");
+test("综合测试", function() {
+    var data = "  sogou-inc.com  \n"
+              + " Haidian District \n"
+              + "    \n"
+              + "   \n"
+              + "Beijing\n"
+              + "China\n"
+              + "\n"
+              + "\n"
+              + "Beijing\n"
+              + "\n"
+              + "\n"
+              + "0123456789012345678901234567890\n"
+              + "BIZTECH\n"
+              + "\n"
+    check(data, 
+        "textarea[rows5&length20&noBlankLine&noRepeat&noBlankHead&noBlankRear]", 
+        results.E431, 
+        "sogou-inc.com\n"
+          + "Haidian District\n"
+          + "Beijing\n"
+          + "China\n"
+          + "01234567890123456789"
+        );
 });

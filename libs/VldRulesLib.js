@@ -49,7 +49,8 @@ var VldRulesLib = {
         E427: "密码安全级别不够,至少包含数字和字母",
         E428: "密码安全级别不够,至少包含数字和大小写字母",
         E429: "密码安全级别不够,至少包含数字、大小写字母、符号",
-        E430: "包含多个空格"
+        E430: "包含多个空格",
+        E431: "文本不符合要求"
     },
 
     //检测value是否为空，args是否为数字
@@ -472,6 +473,70 @@ var VldRulesLib = {
             }
             return result;
         },
+
+        /*
+         * textarea的rule格式为textarea[rows8&length10&noBlankLine&noRepeat&noBlankHead&noBlankRear]
+         * 参数位置可任意调换,用&连接
+         * rows8:最大行数,rows后接数字,不设为无限
+         * length10:每行最大字数,length后接数字,不设为无限
+         * noBlankLine:不允许空白行
+         * noRepeat:不允许重复行
+         * noBlankHead:不允许每行首位空白
+         * noBlankRear:不允许每行末尾空白
+         */
+        textarea: function(value, args, msg1, msg2){
+            var result = {};
+            if(value == ""){
+                //return setResult(true, "E201", msg1, value);
+                return setResult(true, "E200", msg1, value);
+            }
+            var lines = value.match(/(.*\n)|(.*[^\n].*$)/g);
+            var cached = {};
+            var maxLength = -1;
+            var maxRows = -1;
+            var revisedVal = [];
+            var count = 0;
+            if(args.indexOf("length") != -1) {
+                maxLength = /length([\d]+)/.exec(args)[1];
+            }
+            if(args.indexOf("rows") != -1){
+                maxRows = /rows([\d]+)/.exec(args)[1];
+            }
+            for(var i = 0, len = lines.length; i < len; i++){
+                if(args.indexOf("noBlankLine") != -1) {
+                    lines[i] = lines[i].replace(/^[\s]*\n$/,"");
+                }
+                if(args.indexOf("noBlankHead") != -1) {
+                    lines[i] = lines[i].replace(/^[\s]+/, "");
+                }
+                if(args.indexOf("noBlankRear") != -1) {
+                    lines[i] = lines[i].replace(/[\s]+\n$/, "\n");
+                }
+                if(maxLength != -1) {
+                    lines[i] = lines[i].substr(0,maxLength);
+                }
+                if(args.indexOf("noRepeat") != -1){
+                    if(cached[lines[i]]) {
+                        lines[i] = "";
+                    } else {
+                        cached[lines[i]] = true;
+                    }
+                }
+                if(lines[i] != ""){
+                    count++
+                }
+                if(maxRows != -1 && count > maxRows){
+                    lines[i] = "";
+                }
+            }
+            lines = lines.join("");
+            if(lines != value){
+                return setResult(false, "E431", msg2, lines);
+            } else {
+                return setResult(true, "E200", msg1, value);
+            }
+        },
+
         trad2simp: function(value, args, msg1, msg2) {
             var result = {};
             if(value == ""){
