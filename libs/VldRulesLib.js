@@ -44,8 +44,8 @@ var VldRulesLib = {
         E422: "包含了指定字符以外的字符",
         E423: "包含了指定的字符",
         E424: "包含繁体字符",
-        E425: "非整数",
-        E426: "非小数",
+        E425: "非整数或位数超出",
+        E426: "非小数或位数超出",
         E427: "密码安全级别不够,至少包含数字和字母",
         E428: "密码安全级别不够,至少包含数字和大小写字母",
         E429: "密码安全级别不够,至少包含数字、大小写字母、符号",
@@ -230,45 +230,89 @@ var VldRulesLib = {
 
         number: function(value, args, msg1, msg2) {
             var result = {};
+            var regStr = "";
+            if(args){
+                regStr = "^-?[\\d]*(\\.[\\d]{0," + args + "})?$";
+            } else {
+                regStr = "^-?[\\d]*(\\.[\\d]*)?$";
+            }
+            var reg = new RegExp(regStr,"g");
             if (value == "") {
                 //result = setResult(true, "E201", msg1, value);
                 result = setResult(true, "E200", msg1, value);
-            } else if (/^-?[\d\.]*$/.test(value)) {
+            } else if (reg.test(value)) {
                 result = setResult(true, "E200", msg1, value);
             } else {
+                var reg1Str = "";
+                if(args){
+                    reg1Str = "(\\.\\d{0," + args + "})(\\d*)";
+                } else {
+                    reg1Str = "(\\d*)";
+                }
+                var reg1 = new RegExp(reg1Str,"g");
                 var newVal = value.replace(/[^\d\.-]/ig, "");
                 newVal = newVal.charAt(0) + newVal.substr(1, newVal.length - 1).replace(/-/g, "");
+                newVal = newVal.replace(reg1,"$1");
                 result = setResult(false, "E404", msg2, newVal);
             }
             return result;
         },
 
-        int: function(value, args, msg1, msg2) {
+        num_int: function(value, args, msg1, msg2) {
             var result = {};
+            var regStr = "";
+            if(args){
+                regStr = "^-?[\\d]{0," + args + "}$";
+            } else {
+                regStr = "^-?[\\d]+$";
+            }
+            var reg = new RegExp(regStr,"g");
             if (value == "") {
                 //result = setResult(true, "E201", msg1, value);
                 result = setResult(true, "E200", msg1, value);
-            } else if (/^-?[\d]*$/.test(value)) {
+            } else if (reg.test(value)) {
                 result = setResult(true, "E200", msg1, value);
             } else {
+                var reg1Str = "";
+                if(args){
+                    reg1Str = "(\\d{0," + args + "})\\d*";
+                } else {
+                    reg1Str = "(\\d*)";
+                }
+                var reg1 = new RegExp(reg1Str,"g");
                 var newVal = value.replace(/[^\d-]/ig, "");
                 newVal = newVal.charAt(0) + newVal.substr(1, newVal.length - 1).replace(/-/g, "");
+                newVal = newVal.replace(reg1,"$1");
                 result = setResult(false, "E425", msg2, newVal);
             }
             return result;
         },
 
-        float: function(value, args, msg1, msg2) {
+        num_float: function(value, args, msg1, msg2) {
             var result = {};
+            var regStr = "";
+            if(args){
+                regStr = "^-?[\\d]*\\.[\\d]{0," + args + "}$";
+            } else {
+                regStr = "^-?[\\d]*\\.[\\d]*$";
+            }
+            var reg = new RegExp(regStr,"g");
             if (value == "") {
                 //result = setResult(true, "E201", msg1, value);
                 result = setResult(true, "E200", msg1, value);
-            } else if (/^-?[\d]*\.[\d]+$/g.test(value)) {
+            } else if (reg.test(value)) {
                 result = setResult(true, "E200", msg1, value);
             } else {
+                var reg1Str = "";
+                if(args){
+                    reg1Str = "(\\.\\d{0," + args + "})(\\d*)";
+                } else {
+                    reg1Str = "(\\.\\d*)";
+                }
+                var reg1 = new RegExp(reg1Str,"g");
                 var newVal = value.replace(/[^\d-\.]/ig, "");
                 newVal = newVal.charAt(0) + newVal.substr(1, newVal.length - 1).replace(/-/g, "");
-                result.revisedVal = newVal;
+                newVal = newVal.replace(reg1,"$1");
                 result = setResult(false, "E426", msg2, newVal);
             }
             return result;
@@ -364,7 +408,7 @@ var VldRulesLib = {
             if (parseFloat(value) < parseFloat(args)) {
                 result = setResult(true, "E200", msg1, value);
             } else {
-                result = setResult(false, "E408", msg2, value);
+                result = setResult(false, "E408", msg2, args);
             }
             return result;
         },
@@ -377,7 +421,11 @@ var VldRulesLib = {
             if (parseFloat(value) > parseFloat(args)) {
                 result = setResult(true, "E200", msg1, value);
             } else {
-                result = setResult(false, "E409", msg2, value);
+                var newVal = value;
+                if(args >= 0){
+                    newVal = newVal.replace("-","");
+                }
+                result = setResult(false, "E409", msg2, newVal);
             }
             return result;
         },
@@ -403,7 +451,7 @@ var VldRulesLib = {
             if (parseFloat(value) <= parseFloat(args)) {
                 result = setResult(true, "E200", msg1, value);
             } else {
-                result = setResult(false, "E408", msg2, value);
+                result = setResult(false, "E408", msg2, args);
             }
             return result;
         },
@@ -416,7 +464,11 @@ var VldRulesLib = {
             if (parseFloat(value) >= parseFloat(args)) {
                 result = setResult(true, "E200", msg1, value);
             } else {
-                result = setResult(false, "E409", msg2, value);
+                var newVal = value;
+                if(args >= 0){
+                    newVal = newVal.replace("-","");
+                }
+                result = setResult(false, "E409", msg2, newVal);
             }
             return result;
         },
@@ -438,6 +490,8 @@ var VldRulesLib = {
 
         //只能包含某些字符，参数为指定字符的列表,"'\三个字符需要使用斜线转义
         only: function(value, args, msg1, msg2) {
+            args = args.replace("\\\[","[");
+            args = args.replace("\\\]","\]");
             var result = {};
             if (value == "") {
                 //return setResult(true, "E201", msg1, value);
@@ -457,6 +511,8 @@ var VldRulesLib = {
 
         //不能包含某些字符，参数为指定字符的列表,"'\三个字符需要使用斜线转义
         exclude: function(value, args, msg1, msg2) {
+            args = args.replace("\\\[","[");
+            args = args.replace("\\\]","\]");
             var result = {};
             if (value == "") {
                 //return setResult(true, "E201", msg1, value);
@@ -595,9 +651,18 @@ var VldRulesLib = {
     parseRule: function(rule) {
         var results = [];
         var rules = [];
-        var reg_args = /\[[(\s\S)]+?\]/ig;
-        var args = rule.match(reg_args);
-        rule = rule.replace(reg_args, "##");
+        //var reg_args = /[^\\]\[[(\s\S)]+?[^\\]\]/g;
+        //var args = rule.match(reg_args);
+        var reg_args = /(\s|[^\\])\[([\s\S]*?[^\\]+?)(\])/g;
+        var args = [];
+        if(rule.indexOf("[") != -1){
+            var arg = reg_args.exec(rule);
+            while(reg_args.lastIndex != 0){
+                args.push(arg[2]);
+                arg = reg_args.exec(rule);
+            }
+            rule = rule.replace(reg_args, "$1##");
+        }
         if (rule.indexOf("&") != -1) {
             rules = rule.split("&");
             results.push({
@@ -616,7 +681,7 @@ var VldRulesLib = {
             var name = temp[1]; //规则名
             var arg = null;
             if (temp[2] == "##") {
-                arg = args.shift().replace(/\[|\]/g, ""); //参数
+                arg = args.shift(); //参数
             }
             if (!VldRulesLib.rulesTable[name]) {
                 console.log("规则错误！");
@@ -747,6 +812,5 @@ var VldRulesLib = {
         } else {
             return false;
         }
-    },
-
+    }
 };

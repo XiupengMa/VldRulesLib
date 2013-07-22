@@ -267,49 +267,57 @@ test("字母符号", function() {
 });
 
 //int
-module("int");
+module("num_int");
 test("数字", function() {
     var data = "1234321";
-    check(data, "int", results.E200, data);
+    check(data, "num_int", results.E200, data);
+});
+test("位数超出", function() {
+    var data = "1234567890";
+    check(data, "num_int[7]", results.E425, "1234567");
 });
 test("负数", function() {
     var data = "-1234321";
-    check(data, "int", results.E200, data);
+    check(data, "num_int", results.E200, data);
 });
 test("小数", function() {
     var data = "1234321.111231";
-    check(data, "int", results.E425, "1234321111231");
+    check(data, "num_int", results.E425, "1234321111231");
 });
 test("多个负号", function() {
     var data = "-123--45-1-2-3-%$#ADFdf";
-    check(data, "int", results.E425, "-12345123");
+    check(data, "num_int", results.E425, "-12345123");
 });
 test("字母符号", function() {
     var data = "+_)(*&^%$#@!<>?:{}[];',1/\"asdfghjkl ";
-    check(data, "int", results.E425, "1");
+    check(data, "num_int", results.E425, "1");
 });
 
 //float
-module("float");
+module("num_float");
 test("整数", function() {
     var data = "1234321";
-    check(data, "float", results.E426, data);
+    check(data, "num_float", results.E426, data);
 });
 test("负数", function() {
     var data = "-123.4321";
-    check(data, "float", results.E200, data);
+    check(data, "num_float", results.E200, data);
 });
 test("小数", function() {
     var data = "1234321.111231";
-    check(data, "float", results.E200, data);
+    check(data, "num_float", results.E200, data);
+});
+test("位数超出", function() {
+    var data = "1234321.111231";
+    check(data, "num_float[3]", results.E426, "1234321.111");
 });
 test("多个负号", function() {
     var data = "-123--45-1-2-3-%$#ADFdf";
-    check(data, "float", results.E426, "-12345123");
+    check(data, "num_float", results.E426, "-12345123");
 });
 test("字母符号", function() {
     var data = "+_)(*&^%$#@!<>?:{}[];',1/\"asdfghjkl ";
-    check(data, "float", results.E426, "1");
+    check(data, "num_float", results.E426, "1");
 });
 
 //pwdL1
@@ -434,7 +442,7 @@ test("等于", function() {
 });
 test("大于", function() {
     var data = "101";
-    check(data, "lt[100]", results.E408, data);
+    check(data, "lt[100]", results.E408, "100");
 });
 test("负数", function() {
     var data = "-101";
@@ -476,6 +484,13 @@ test("非法字符", function() {
     check(data, "gt[100]", results.E404, "");
 });
 
+//le&ge
+module("ge&le");
+test("非法", function() {
+    var data = "99";
+    check(data, "ge[100]&le[200]", results.E409, data);
+});
+
 //equal
 module("equal");
 test("小于", function() {
@@ -515,11 +530,11 @@ test("等于", function() {
 });
 test("大于", function() {
     var data = "101";
-    check(data, "le[100]", results.E408, data);
+    check(data, "le[100]", results.E408, "100");
 });
 test("负数", function() {
     var data = "-99";
-    check(data, "le[-100]", results.E408, data);
+    check(data, "le[-100]", results.E408, "-100");
 });
 test("小数", function() {
     var data = "-100.000";
@@ -582,10 +597,10 @@ test("非法字符", function() {
 
 //only
 module("only");
-// test("符号",function(){
-//     var data = "_+=-)(*&^%$#@!~`\\|}{\":?><][';//.,']";
-//     check(data,"only[~!@#$%^&*()`[];',./{}:\"<>?\'\\|_+-=]",results.E200,data);
-// });
+test("符号",function(){
+    var data = "_+=-)(*&^%$#@!~`\\|}{\":?><][';//.,']";
+    check(data,"only[~!@#$%^&*()`\\\[\\\];',\./{}:\"<>?\'\\|_+-=]",results.E200,data);
+});
 test("数字大小写字母", function() {
     var data = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
     check(data, "only[A-Za-z0-9]", results.E200, data);
@@ -597,10 +612,10 @@ test("非法字符", function() {
 
 //exclude
 module("exclude");
-// test("符号",function(){
-//     var data = "_+=-)(*&^%$#@!~`\\|}{\":?><][';//.,']";
-//     check(data,"exclude[~!@#$%^&*()`[];',./{}:\"<>?\'\\|_+-=]",results.E200,data);
-// });
+test("符号",function(){
+    var data = "_+=-)(*&^%$#@!~`\\|}{\":?><][';//.,']";
+    check(data,"exclude[~!@#$%^&*()`\\\[\\\];',./{}:\"<>?\'\\|_+-=]",results.E200,data);
+});
 test("数字大小写字母", function() {
     var data = "abcdefghijklmnopqrstuvwxyzABCDE&FGHIJKL|MNOPQRSTUVWXYZ1234567890";
     check(data, "exclude[A-Za-z0-9]", results.E423, "&|");
