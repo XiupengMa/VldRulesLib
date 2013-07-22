@@ -488,7 +488,7 @@ var VldRulesLib = {
             return result;
         },
 
-        //只能包含某些字符，参数为指定字符的列表,"'\三个字符需要使用斜线转义
+        //只能包含某些字符，参数为指定字符的列表,按正则表达式的规则进行转义
         only: function(value, args, msg1, msg2) {
             args = args.replace("\\\[","[");
             args = args.replace("\\\]","\]");
@@ -509,7 +509,7 @@ var VldRulesLib = {
             return result;
         },
 
-        //不能包含某些字符，参数为指定字符的列表,"'\三个字符需要使用斜线转义
+        //不能包含某些字符，参数为指定字符的列表,按正则表达式的规则进行转义
         exclude: function(value, args, msg1, msg2) {
             args = args.replace("\\\[","[");
             args = args.replace("\\\]","\]");
