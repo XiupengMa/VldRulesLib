@@ -641,7 +641,6 @@ define("VldRulesLib",[''],function(require,exports,module){
             }
         },
 
-
         /*
          * 规则解析函数，将复合规则解析成object
          * @param:rule        {string} 规则语句
