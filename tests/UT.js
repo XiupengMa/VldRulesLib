@@ -70,6 +70,14 @@ test("max[-3]", function() {
     check(data, [VldRulesLib.RULES.max(-3)], true, "");
 });
 
+//maxBytes
+module("maxBytes");
+test("maxBytes[6]",function(){
+    var data = "中国人";
+    check(data, [VldRulesLib.RULES.maxbytes(6)], true, data);
+    var data = "中国人";
+    check(data, [VldRulesLib.RULES.maxbytes(5)], false, "中国");
+});
 //email
 module("email");
 test("合法", function() {

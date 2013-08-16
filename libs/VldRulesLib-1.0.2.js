@@ -23,10 +23,10 @@ function defineVldRulesLib(window){
         if (!check) {
             throw new Error("扩展规则错误，至少需要包含check方法");
         }
-        VldRulesLib.RULES[ruleName] = function(args){
+        VldRulesLib.RULES[ruleName.toLowerCase()] = function(args){
             return VldRulesLib.getRuleStr(ruleName,args);
         };
-        VldRulesLib.rules[ruleName] = {
+        VldRulesLib.rules[ruleName.toLowerCase()] = {
             check: check,
             revise: revise
         }
@@ -84,7 +84,7 @@ function defineVldRulesLib(window){
             throw new Error("参数错误!");
             return false;
         }
-        return value.length >= args ? true : false;
+        return value.length >= args;
     });
 
     /* 最大长度 */
@@ -93,9 +93,30 @@ function defineVldRulesLib(window){
             throw new Error("参数错误!");
             return false;
         }
-        return value.length <= args ? true : false;
+        return value.length <= args;
     }, function(value, args) {
         return value.substr(0, args);
+    });
+
+    /* 最大长度,以字节为单位进行计算 */
+    VldRulesLib.extend("maxBytes", function(value,args){
+        var len = value.length;
+        value.replace(/[\u0080-\ufff0]/g, function() {
+            len++;
+        });
+        return len <= args;
+    },function(value,args){
+        var result = [];
+        for(var i = 0; i < args; i++){
+            if(/[\u0080-\ufff0]/.test(value.charAt(i))){
+                if(i + 1 >= args){
+                    break;
+                }
+                args = args - 1;
+            }
+            result.push(value.charAt(i));
+        }
+        return result.join("");
     });
 
     /* 小于 */
@@ -418,6 +439,36 @@ function defineVldRulesLib(window){
             }
         }
         return newVal.join("");
+    });
+
+    /* regexp */
+    VldRulesLib.extend("regexp", function(value,args){
+        var reg = new RegExp(args);
+        return reg.test(value);
+    });
+
+    /* refuse */
+    VldRulesLib.extend("refuse", function(value,args){
+        var reg = new RegExp(args,"g");
+        return !reg.test(value);
+    }, function(value,args){
+        var reg = new RegExp(args,"g");
+        return value.replace(reg,"");
+    });
+
+    /* replace */
+    VldRulesLib.extend("replace", function(value,args){
+        var dArgs = /^([\s\S]*?)(\]\[([\s\S]*))?$/.exec(args);
+        var arg1 = dArgs[1];
+        var arg2 = dArgs[3];
+        var reg = new RegExp(arg1,"g");
+        return !reg.test(value);
+    }, function(value,args){
+        var dArgs = /^([\s\S]*?)(\]\[([\s\S]*))?$/.exec(args);
+        var arg1 = dArgs[1];
+        var arg2 = dArgs[3];
+        var reg = new RegExp(arg1,"g");
+        return value.replace(reg,arg2);
     });
 
     /* 验证

@@ -13,7 +13,7 @@
 
 <div class="main">
     <label for="data">验证数据:</label>
-    <input id="data" name="data"/>
+    <textarea id="data" name="data" rows="5" cols="20"></textarea>
     <select id="rule" name="rule">
         <option value="required">不为空</option>
         <option value="min[3]&max[10]">长度3-10</option>
@@ -33,13 +33,17 @@
         <option value="exclude[a-zA-Z0-9.,:!@#$%^&*()\\]">不包含</option>
         <option value="trad2simp">繁简转换</option>
         <option value="regexp[/\/TEST\//ig]">自定义正则</option>
+        <option value="maxBytes[9]">最大字节长度</option>
+        <option value="refuse[\n]">refuse</option>
+        <option value="replace[\t+|\uF8F5+|\r+][ ]">replace</option>
+        <option value="regExp[^[a-zA-Z]+\d+[a-zA-Z]+$]">regexp</option>
     </select>
     <br/>
     <div class="message"></div>
     <input type="button" id="submit" name="submit" value="验证"/>
 </div>
 <script type="text/javascript" src="../libs/jquery-2.0.1.js"></script>
-<script type="text/javascript" src="../libs/VldRulesLib-1.0.1.js"></script>
+<script type="text/javascript" src="../libs/VldRulesLib-1.0.2.js"></script>
 <script type="text/javascript" src="sample.js"></script>
 </body>
 </html>
