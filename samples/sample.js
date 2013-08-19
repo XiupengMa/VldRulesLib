@@ -3,10 +3,13 @@ $(document).ready(function() {
     var input = $("#data")[0];
     var select = $("#rule")[0];
     msgDiv.hide();
-    $("#submit").bind("click", function() {
+    $("#add-value").on("click",function(){
+        var data = "AAA\u0003\n\u0005BBB";
+        input.value = data;
+    });
+    $("#submit").on("click", function() {
         var data = input.value;
         var rule = select.value.split("&");
-        //调用格式 VldRulesLib.validate(value,rule,success,fail)
         var result = VldRulesLib.validate(data, rule);
         if(result.passed){
             ok(result.revisedVal);

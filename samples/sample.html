@@ -34,12 +34,13 @@
         <option value="trad2simp">繁简转换</option>
         <option value="regexp[/\/TEST\//ig]">自定义正则</option>
         <option value="maxBytes[9]">最大字节长度</option>
-        <option value="refuse[\n]">refuse</option>
-        <option value="replace[\t+|\uF8F5+|\r+][ ]">replace</option>
+        <option value="refuse[\u0003\n\u0005]">refuse</option>
+        <option value="replace[\t+|\uF8F5+|\r+][*]">replace</option>
         <option value="regExp[^[a-zA-Z]+\d+[a-zA-Z]+$]">regexp</option>
     </select>
     <br/>
     <div class="message"></div>
+    <input type="button" id="add-value" name="add" value="添加值">
     <input type="button" id="submit" name="submit" value="验证"/>
 </div>
 <script type="text/javascript" src="../libs/jquery-2.0.1.js"></script>
