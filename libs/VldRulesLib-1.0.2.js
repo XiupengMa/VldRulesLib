@@ -471,6 +471,61 @@ function defineVldRulesLib(window){
         return value.replace(reg,arg2);
     });
 
+    /* chgCase
+     * args:0全到半，1半到全，其他不转化
+     */
+    VldRulesLib.extend("chgCase", function(value, args){
+        if (typeof value != "string" || value.length <= 0
+                || !(args == 0 || args == 1)) {
+            return true;
+        }
+        var i, oRs = [], iCode;
+        if (args == 1) {/* 半->全 */
+            for (i = 0; i < value.length; i += 1) {
+                iCode = value.charCodeAt(i);
+                if (iCode == 32 || iCode < 127) { //存在半角,需要转换
+                    return false;
+                }
+            }
+        } else if(args == 0) {/* 全->半 */
+            for (i = 0; i < value.length; i += 1) {
+                iCode = value.charCodeAt(i);
+                if (iCode == 12288 || (iCode > 65280 && iCode < 65375)) { //存在全角,需要转换
+                    return false;
+                }
+            }
+        }
+        return true; //不需要转换
+    }, function(value,args){
+        if (typeof value != "string" || value.length <= 0
+                || !(args == 0 || args == 1)) {
+            return value;
+        }
+        var i, result = [], iCode;
+        if (args == 1) {/* 半->全 */
+            for (i = 0; i < value.length; i += 1) {
+                iCode = value.charCodeAt(i);
+                if (iCode == 32) {
+                    iCode = 12288;
+                } else if (iCode < 127) {
+                    iCode += 65248;
+                }
+                result.push(String.fromCharCode(iCode));
+            }
+        } else if(args == 0) {/* 全->半 */
+            for (i = 0; i < value.length; i += 1) {
+                iCode = value.charCodeAt(i);
+                if (iCode == 12288) {
+                    iCode = 32;
+                } else if (iCode > 65280 && iCode < 65375) {
+                    iCode -= 65248;
+                }
+                result.push(String.fromCharCode(iCode));
+            }
+        }
+        return result.join("");
+    });
+
     /* 验证
      * @param value {string} 待验证数据
      * @param rule  {array}  规则数组,每个元素是规则字符串
