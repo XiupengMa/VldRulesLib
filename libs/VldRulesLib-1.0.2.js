@@ -2,7 +2,7 @@ function defineVldRulesLib(window){
     /*
      * VldRulesLib 验证规则库
      * @author Maxiupeng
-     * @date 2013-8-2
+     * @date 2013-8-27
      */
 
     /* 声明命名空间 */
@@ -18,7 +18,11 @@ function defineVldRulesLib(window){
     /* 规则名集合 */
     VldRulesLib.RULES = {};
 
-    /* 扩展规则 */
+    /* 扩展规则
+     * @param ruleName {string}            规则名
+     * @param check    {function} {RegExp} 验证函数
+     * @param revise   {function}          修正函数
+     */
     VldRulesLib.extend = function(ruleName, check, revise) {
         if (!check) {
             throw new Error("扩展规则错误，至少需要包含check方法");
@@ -32,7 +36,9 @@ function defineVldRulesLib(window){
         }
     };  
 
-    /* 生成规则字符串 */
+    /* 生成规则字符串
+     * 根据规则名和参数，生成规则
+     */
     VldRulesLib.getRuleStr = function(ruleName,args){
         if(args !== undefined){
             return ruleName + "[" + args + "]";
@@ -40,6 +46,8 @@ function defineVldRulesLib(window){
             return ruleName;
         }
     }
+
+    /* 内置基本规则 */
 
     /* 必填 */
     VldRulesLib.extend("required", /.+/);
@@ -441,7 +449,7 @@ function defineVldRulesLib(window){
         return newVal.join("");
     });
 
-    /* regexp */
+    /* 正则表达式 */
     VldRulesLib.extend("regexp", function(value,args){
         var reg = new RegExp(args);
         return reg.test(value);
@@ -471,7 +479,7 @@ function defineVldRulesLib(window){
         return value.replace(reg,arg2);
     });
 
-    /* chgCase
+    /* chgCase 全角半角转换
      * args:0全到半，1半到全，其他不转化
      */
     VldRulesLib.extend("chgCase", function(value, args){
@@ -534,6 +542,7 @@ function defineVldRulesLib(window){
         var rules = VldRulesLib._parseRule(rule);
         var details = []; //记录每个规则的返回结果
         var cpyValue = value; //记录每次revised后的value
+        var passed = true; //是否通过检验
 
         if (value == "") { //空值处理
             for(var i = 0; i < rules.length; i++){
@@ -548,7 +557,7 @@ function defineVldRulesLib(window){
                 if (VldRulesLib.rules[rules[i].rule] && VldRulesLib.rules[rules[i].rule].check) {
                     var checkResult = typeof VldRulesLib.rules[rules[i].rule].check == "function" ? VldRulesLib.rules[rules[i].rule].check(value, rules[i].args) : VldRulesLib.rules[rules[i].rule].check.test(value);
                     var revisedVal = VldRulesLib.rules[rules[i].rule].revise != undefined ? VldRulesLib.rules[rules[i].rule].revise(cpyValue, rules[i].args) : cpyValue;
-                    cpyValue = revisedVal;
+                    cpyValue = revisedVal; //修正后的值传递给下一个规则继续修正
                     details.push(checkResult);
                 } else {
                     throw new Error("规则错误!");
@@ -556,8 +565,7 @@ function defineVldRulesLib(window){
             }
         }
 
-
-        var passed = true;
+        
         for (var i = 0; i < details.length; i++) {
             if (!details[i]) {
                 passed = false;
@@ -573,7 +581,9 @@ function defineVldRulesLib(window){
         };
     };
 
-    /* 解析规则 */
+    /* 解析规则
+     * 将规则数组中的每一个规则字符串，拆分成规则名和参数，并转换成object
+     */
     VldRulesLib._parseRule = function(rules) {
         var results = [];
         var reg = /^(\w+)(\[([\s\S]+)\])?$/;
@@ -595,7 +605,7 @@ function defineVldRulesLib(window){
     return VldRulesLib;
 }
 
-
+/* seajs封装 */
 if (typeof define == "function") {
     define("VldRulesLib", function(require, exports, module) {
         defineVldRulesLib(window);
