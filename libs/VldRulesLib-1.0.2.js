@@ -227,6 +227,7 @@ function defineVldRulesLib(window){
 
     /* 整型数字,参数为数字位数 */
     VldRulesLib.extend("num_int", function(value, args) {
+        var regStr = "";
         if (args) {
             regStr = "^-?[\\d]{0," + args + "}$";
         } else {
