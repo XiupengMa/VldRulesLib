@@ -205,10 +205,14 @@ function defineVldRulesLib(window){
         if(VldRulesLib.validate(value, ["phone"]).passed||VldRulesLib.validate(value, ["mobile"]).passed)
            return true;
         return false;
+    },function(value){
+        return value.replace(/[^0-9\-\(\)\s]/ig, "");
     });
     
     /* 钱数验证*/
-    VldRulesLib.extend("money",/^(([1-9]+)|([0-9]+\.[0-9]{0,2}))$/);    
+    VldRulesLib.extend("money",/^(([1-9]+)|([0-9]+\.[0-9]{0,2}))$/,function(value,args){
+    	return VldRulesLib.rules['number'].revise(value,2);
+    });    
 
     /* url,参数为协议名,如http,多个协议用|连接.为空表示不限 */
     VldRulesLib.extend("url", function(value, args) {
