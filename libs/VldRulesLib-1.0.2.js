@@ -341,7 +341,11 @@ function defineVldRulesLib(window){
     /* 日期 */
     VldRulesLib.extend("date",  
         /^\d{4}\-[01]?\d\-[0-3]?\d$|^[01]\d\/[0-3]\d\/\d{4}$|^\d{4}年[01]?\d月[0-3]?\d[日号]$/);
-
+        
+    /* trim掉字符串开头的空格 */
+    VldRulesLib.extend("trim_beginspace", function(value) {
+        return value.replace(/\n */g, "\n").replace(/^ */, "");
+    });
     /*
      * textarea的rule格式为textarea[rows8&length10&noBlankLine&noRepeat&noBlankHead&noBlankRear]
      * 参数位置可任意调换,用&连接
